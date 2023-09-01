@@ -1,6 +1,6 @@
-﻿using BTAnshDesai.Controllers.Interfaces;
-using BTAnshDesai.Data;
+﻿using BTAnshDesai.Data;
 using BTAnshDesai.Models;
+using BTAnshDesai.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace BTAnshDesai.Services

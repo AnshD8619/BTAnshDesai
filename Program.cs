@@ -1,7 +1,8 @@
-using BTAnshDesai.Controllers.Interfaces;
 using BTAnshDesai.Data;
 using BTAnshDesai.Models;
 using BTAnshDesai.Services;
+using BTAnshDesai.Services.Factories;
+using BTAnshDesai.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(DataUtility.GetConnectionString(builder.Configuration)));
+    options.UseNpgsql(DataUtility.GetConnectionString(builder.Configuration), o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentity<BTUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultUI()
+    .AddEntityFrameworkStores<ApplicationDbContext>().AddClaimsPrincipalFactory<BTUserClaimsPrincipalFactory>()
+    .AddDefaultUI()
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IBTRolesService, BTRolesService>();
@@ -25,6 +27,7 @@ builder.Services.AddScoped<IBTTicketHistoryService, BTTicketHistoryService>();
 builder.Services.AddScoped<IBTNotificationService, BTNotificationService>();
 builder.Services.AddScoped<IBTInviteService, BTInviteService>();
 builder.Services.AddScoped<IBTFileService, BTFileService>();
+builder.Services.AddScoped<IBTLookupService, BTLookupService>();
 builder.Services.AddScoped<IEmailSender, BTEmailService>();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddControllersWithViews();

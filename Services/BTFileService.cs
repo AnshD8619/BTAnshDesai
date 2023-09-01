@@ -1,6 +1,4 @@
-﻿
-
-using BTAnshDesai.Controllers.Interfaces;
+﻿using BTAnshDesai.Services.Interfaces;
 
 namespace BTAnshDesai.Services
 {

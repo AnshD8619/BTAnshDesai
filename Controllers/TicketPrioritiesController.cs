@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using BTAnshDesai.Data;
+﻿using BTAnshDesai.Data;
 using BTAnshDesai.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BTAnshDesai.Controllers
 {
@@ -22,9 +17,9 @@ namespace BTAnshDesai.Controllers
         // GET: TicketPriorities
         public async Task<IActionResult> Index()
         {
-              return _context.TicketPriorities != null ? 
-                          View(await _context.TicketPriorities.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.TicketPriorities'  is null.");
+            return _context.TicketPriorities != null ?
+                        View(await _context.TicketPriorities.ToListAsync()) :
+                        Problem("Entity set 'ApplicationDbContext.TicketPriorities'  is null.");
         }
 
         // GET: TicketPriorities/Details/5
@@ -150,14 +145,14 @@ namespace BTAnshDesai.Controllers
             {
                 _context.TicketPriorities.Remove(ticketPriority);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool TicketPriorityExists(int id)
         {
-          return (_context.TicketPriorities?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.TicketPriorities?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

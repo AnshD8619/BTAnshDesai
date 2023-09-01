@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using BTAnshDesai.Data;
+﻿using BTAnshDesai.Data;
 using BTAnshDesai.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BTAnshDesai.Controllers
 {
@@ -22,9 +17,9 @@ namespace BTAnshDesai.Controllers
         // GET: Companies
         public async Task<IActionResult> Index()
         {
-              return _context.Companies != null ? 
-                          View(await _context.Companies.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Companies'  is null.");
+            return _context.Companies != null ?
+                        View(await _context.Companies.ToListAsync()) :
+                        Problem("Entity set 'ApplicationDbContext.Companies'  is null.");
         }
 
         // GET: Companies/Details/5
@@ -150,14 +145,14 @@ namespace BTAnshDesai.Controllers
             {
                 _context.Companies.Remove(company);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CompanyExists(int id)
         {
-          return (_context.Companies?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Companies?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

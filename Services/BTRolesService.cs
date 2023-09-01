@@ -1,8 +1,8 @@
-﻿
-using BTAnshDesai.Controllers.Interfaces;
-using BTAnshDesai.Data;
+﻿using BTAnshDesai.Data;
 using BTAnshDesai.Models;
+using BTAnshDesai.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BTAnshDesai.Services
 {
@@ -36,7 +36,22 @@ namespace BTAnshDesai.Services
             IEnumerable<string> roles = await _userManager.GetRolesAsync(user);
             return roles;
         }
+        public async Task<List<IdentityRole>> GetRolesAsync()
+        {
+            try
+            {
+                List<IdentityRole> result = new();
 
+                result = await _context.Roles.ToListAsync();
+
+                return result;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         public async Task<List<BTUser>> GetUsersInRoleAsync(string roleName, int companyId)
         {
             List<BTUser> users = (await _userManager.GetUsersInRoleAsync(roleName)).ToList();

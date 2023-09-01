@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using BTAnshDesai.Data;
+﻿using BTAnshDesai.Data;
 using BTAnshDesai.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BTAnshDesai.Controllers
 {
@@ -22,9 +17,9 @@ namespace BTAnshDesai.Controllers
         // GET: TicketStatus
         public async Task<IActionResult> Index()
         {
-              return _context.TicketStatuses != null ? 
-                          View(await _context.TicketStatuses.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.TicketStatuses'  is null.");
+            return _context.TicketStatuses != null ?
+                        View(await _context.TicketStatuses.ToListAsync()) :
+                        Problem("Entity set 'ApplicationDbContext.TicketStatuses'  is null.");
         }
 
         // GET: TicketStatus/Details/5
@@ -150,14 +145,14 @@ namespace BTAnshDesai.Controllers
             {
                 _context.TicketStatuses.Remove(ticketStatus);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool TicketStatusExists(int id)
         {
-          return (_context.TicketStatuses?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.TicketStatuses?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

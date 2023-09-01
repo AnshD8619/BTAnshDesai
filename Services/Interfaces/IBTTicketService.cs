@@ -1,8 +1,6 @@
-﻿
+﻿using BTAnshDesai.Models;
 
-using BTAnshDesai.Models;
-
-namespace BTAnshDesai.Controllers.Interfaces
+namespace BTAnshDesai.Services.Interfaces
 {
     public interface IBTTicketService
     {

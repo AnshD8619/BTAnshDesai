@@ -1,4 +1,4 @@
-﻿namespace BTAnshDesai.Controllers.Interfaces
+﻿namespace BTAnshDesai.Services.Interfaces
 {
     public interface IBTFileService
     {

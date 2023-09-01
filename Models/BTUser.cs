@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BTAnshDesai.Models
 {
-    public class BTUser: IdentityUser
+    public class BTUser : IdentityUser
     {
         [Required]
         [Display(Name = "First Name")]

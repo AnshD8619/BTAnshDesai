@@ -1,7 +1,6 @@
-﻿
-using BTAnshDesai.Controllers.Interfaces;
-using BTAnshDesai.Data;
+﻿using BTAnshDesai.Data;
 using BTAnshDesai.Models;
+using BTAnshDesai.Services.Interfaces;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 

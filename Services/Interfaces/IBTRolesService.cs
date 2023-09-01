@@ -1,7 +1,7 @@
-﻿
-using BTAnshDesai.Models;
+﻿using BTAnshDesai.Models;
+using Microsoft.AspNetCore.Identity;
 
-namespace BTAnshDesai.Controllers.Interfaces
+namespace BTAnshDesai.Services.Interfaces
 {
     public interface IBTRolesService
     {
@@ -13,5 +13,7 @@ namespace BTAnshDesai.Controllers.Interfaces
         public Task<List<BTUser>> GetUsersInRoleAsync(string roleName, int companyId);
         public Task<List<BTUser>> GetUsersNotInRoleAsync(string roleName, int companyId);
         public Task<string> getRoleNameByIdAsync(string roleId);
+        public Task<List<IdentityRole>> GetRolesAsync();
+
     }
 }

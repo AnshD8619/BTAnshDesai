@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BTAnshDesai.Data;
+using BTAnshDesai.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using BTAnshDesai.Data;
-using BTAnshDesai.Models;
 
 namespace BTAnshDesai.Controllers
 {
@@ -173,14 +169,14 @@ namespace BTAnshDesai.Controllers
             {
                 _context.Invites.Remove(invite);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool InviteExists(int id)
         {
-          return (_context.Invites?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Invites?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
