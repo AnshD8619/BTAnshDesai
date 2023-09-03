@@ -1,13 +1,21 @@
 ﻿@model IEnumerable<BTAnshDesai.Models.Project>
-
+@using BTAnshDesai.Models.enums
+@using Microsoft.AspNetCore.Identity
+@using BTAnshDesai.Services.Interfaces
+@inject UserManager<BTUser> UserManager 
+@inject IBTProjectService ProjectService
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "All Projects";
+    BTUser user = await UserManager.GetUserAsync(User);
 }
 
-<h1>Index</h1>
+<h1>All Projects</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    @if(User.IsInRole(Roles.Admin.ToString()) || User.IsInRole(Roles.ProjectManager.ToString())){
+        <a asp-action="Create">Create New</a>
+    } 
+   
 </p>
 <table class="table">
     <thead>
@@ -82,17 +90,26 @@
             <td>
                 @Html.DisplayFor(modelItem => item.ProjectPriority.Id)
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <td>
+                   
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    @if(item.Archived == true)
-                    {
-                        <a asp-action="Restore" asp-route-id="@item.Id">Restore</a>
+                    @{
+                        bool isProjectPM = (await ProjectService.GetProjectManagerAsync(item.Id))?.Id == user.Id;
+
                     }
-                    else
+                    @if (User.IsInRole(Roles.Admin.ToString()) || isProjectPM)
                     {
-                        <a asp-action="Archive" asp-route-id="@item.Id">Archive</a>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        @if (item.Archived == true)
+                        {
+                            <a asp-action="Restore" asp-route-id="@item.Id">Restore</a>
+                        }
+                        else
+                        {
+                            <a asp-action="Archive" asp-route-id="@item.Id">Archive</a>
+                        }
                     }
+                   
                     
             </td>
         </tr>

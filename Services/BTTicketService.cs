@@ -4,7 +4,7 @@ using BTAnshDesai.Models.enums;
 using BTAnshDesai.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-
+using System.IO;
 namespace BTAnshDesai.Services
 {
     public class BTTicketService : IBTTicketService
@@ -34,7 +34,34 @@ namespace BTAnshDesai.Services
 
         }
 
-        public async Task ArchiveTicketAsync(Ticket ticket)
+		public async Task AddTicketAttachmentAsync(TicketAttachment ticketAttachment)
+		{
+			try
+			{
+				await _context.AddAsync(ticketAttachment);
+				await _context.SaveChangesAsync();
+			}
+			catch (Exception ex)
+			{
+
+				throw;
+			}
+		}
+
+		public async Task AddTicketCommentAsync(TicketComment comment)
+		{
+            try
+            {
+                await _context.AddAsync(comment);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+		}
+
+		public async Task ArchiveTicketAsync(Ticket ticket)
         {
             ticket.Archived = true;
             _context.Update(ticket);
@@ -237,9 +264,35 @@ namespace BTAnshDesai.Services
             }
         }
 
-        public async Task<Ticket> GetTicketByIdAsync(int ticketId)
+		public async Task<TicketAttachment> GetTicketAttachmentByIdAsync(int ticketAttachmentId)
+		{
+			try
+			{
+				TicketAttachment ticketAttachment = await _context.TicketAttachments
+																  .Include(t => t.User)
+																  .FirstOrDefaultAsync(t => t.Id == ticketAttachmentId);
+				return ticketAttachment;
+			}
+			catch (Exception)
+			{
+
+				throw;
+			}
+		}
+
+		public async Task<Ticket> GetTicketByIdAsync(int ticketId)
         {
-            return await _context.Tickets.FirstOrDefaultAsync(t => t.Id == ticketId);
+            return await _context.Tickets
+                .Include(t => t.DeveloperUser)
+                .Include(t => t.OwnerUser)
+                .Include(t => t.Project)
+                .Include(t => t.TicketPriority)
+                .Include(t => t.TicketStatus)
+                .Include(t => t.TicketType)
+                .Include(t => t.Comments)
+                .Include(t => t.Attachments)
+                .Include(t => t.History)
+                .FirstOrDefaultAsync(t => t.Id == ticketId);
         }
 
         public async Task<BTUser> GetTicketDeveloperAsync(int ticketId, int companyId)

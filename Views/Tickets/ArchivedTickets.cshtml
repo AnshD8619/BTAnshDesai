@@ -1,14 +1,16 @@
 ﻿@model IEnumerable<BTAnshDesai.Models.Ticket>
-
+@using Microsoft.AspNetCore.Identity
+@using BTAnshDesai.Services.Interfaces
+@using BTAnshDesai.Models.enums
+@inject UserManager<BTUser> UserManager
+@inject IBTProjectService ProjectService
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Archived Tickets";
+    BTUser user = await UserManager.GetUserAsync(User);
 }
 
-<h1>Index</h1>
+<h1>Archived Tickets</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -88,16 +90,21 @@
                 @Html.DisplayFor(modelItem => item.DeveloperUser.Id)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    @if(item.Archived == true)
+
+                    @if(User.IsInRole(Roles.Admin.ToString()) || await ProjectService.IsAssignedProjectManager(user.Id, item.ProjectId))
                     {
-                        <a asp-action="Restore" asp-route-id="@item.Id">Restore</a>
+                        @if (item.Archived == true)
+                        {
+                            <a asp-action="Restore" asp-route-id="@item.Id">Restore</a>
+                        }
+                        else
+                        {
+                            <a asp-action="Archive" asp-route-id="@item.Id">Archive</a>
+                        }
                     }
-                    else
-                    {
-                        <a asp-action="Archive" asp-route-id="@item.Id">Archive</a>
-                    }                  
+                                
             </td>
         </tr>
 }

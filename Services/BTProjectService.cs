@@ -14,7 +14,7 @@ namespace BTAnshDesai.Services
         public BTProjectService(ApplicationDbContext context, IBTRolesService rolesService)
         {
             _context = context;
-            rolesService = _rolesService;
+            _rolesService = rolesService;
             ;
         }
 
@@ -42,7 +42,7 @@ namespace BTAnshDesai.Services
 
             try
             {
-                await AddProjectManagerAsync(userId, projectId);
+                await AddUserToProjectAsync(userId, projectId);
                 return true;
             }
             catch (Exception ex)
@@ -80,8 +80,13 @@ namespace BTAnshDesai.Services
         public async Task ArchiveProjectAsync(Project project)
         {
             project.Archived = true;
-            _context.Update(project);
-            await _context.SaveChangesAsync();
+            await UpdateProjectAsync(project);
+            foreach (Ticket ticket in project.Tickets)
+            {
+                ticket.ArchivedByProject = true;
+                _context.Update(ticket);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<List<BTUser>> GetAllProjectMembersExceptPMAsync(int projectId)
@@ -147,6 +152,15 @@ namespace BTAnshDesai.Services
         {
             Project project = await _context.Projects
                 .Include(p => p.Tickets)
+                .ThenInclude(t => t.TicketPriority)
+                .Include(p => p.Tickets)
+                .ThenInclude(t => t.TicketStatus)
+                .Include(p => p.Tickets)
+                .ThenInclude(t => t.TicketType)
+                .Include(p => p.Tickets)
+                .ThenInclude(t => t.DeveloperUser)
+                .Include(p => p.Tickets)
+                .ThenInclude(t => t.OwnerUser)
                 .Include(p => p.Members)
                 .Include(p => p.ProjectPriority)
                 .FirstOrDefaultAsync(p => p.Id == projectId && p.CompanyId == companyId);
@@ -227,6 +241,26 @@ namespace BTAnshDesai.Services
         {
             List<BTUser> users = await _context.Users.Where(u => u.Projects.All(p => p.Id != projectId)).ToListAsync();
             return users.Where(u => u.CompanyId == companyId).ToList();
+        }
+
+        public async Task<bool> IsAssignedProjectManager(string userId, int projectId)
+        {
+            try
+            {
+                string projectManager = (await GetProjectManagerAsync(projectId))?.Id;
+                if (projectManager == userId) 
+                { 
+                    return true; 
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<bool> IsUserOnProjectAsync(string userId, int projectId)
@@ -314,6 +348,18 @@ namespace BTAnshDesai.Services
             catch (Exception ex)
             {
                 throw;
+            }
+        }
+
+        public async Task RestoreProjectAsync(Project project)
+        {
+            project.Archived = false;
+            await UpdateProjectAsync(project);
+            foreach (Ticket ticket in project.Tickets)
+            {
+                ticket.ArchivedByProject = false;
+                _context.Update(ticket);
+                await _context.SaveChangesAsync();
             }
         }
 
