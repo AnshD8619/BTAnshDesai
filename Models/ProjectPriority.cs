@@ -2,11 +2,11 @@
 
 namespace BTAnshDesai.Models
 {
-    public class ProjectPriority
-    {
-        public int Id { get; set; }
+	public class ProjectPriority
+	{
+		public int Id { get; set; }
 
-        [DisplayName("Priority Name")]
-        public string? Name { get; set; }
-    }
+		[DisplayName("Priority Name")]
+		public string? Name { get; set; }
+	}
 }

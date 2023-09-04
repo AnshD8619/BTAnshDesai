@@ -2,11 +2,11 @@
 
 namespace BTAnshDesai.Models
 {
-    public class TicketStatus
-    {
-        public int Id { get; set; }
+	public class TicketStatus
+	{
+		public int Id { get; set; }
 
-        [DisplayName("Status Name")]
-        public string? Name { get; set; }
-    }
+		[DisplayName("Status Name")]
+		public string? Name { get; set; }
+	}
 }

@@ -13,7 +13,24 @@
 }
 
 <h1>Ticket Details</h1>
+@if (!string.IsNullOrEmpty(Model.DeveloperUserId))
+{
+	<a href="javascript:void(0);">
+		@if (Model.DeveloperUser?.AvatarFileData != null)
+		{
+			<img class="media-object" src="data:image/*;base64,@(Convert.ToBase64String(user.AvatarFileData))" alt="" style="height: 40px; width: 40px" />
+		}
+		else
+		{
+			<img class="media-object" src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" alt="" style="height: 40px; width: 40px" />
+		}
+	</a>
 
+		<span class="text-muted" style="font-size:x-small">
+		Developer: <strong>@Model.DeveloperUser.FullName</strong>
+		</span>
+
+}
 <div>
 	<div classxfont-weighteighteightgetainer-fluid">
 		<div class="row gy-2">
@@ -96,22 +113,7 @@
 									{
 										<li class="online mb-4">
 											<div class="media">
-												<a href="javascript:void(0);">
-													@if (user?.AvatarFileData != null)
-													{
-														<img class="media-object" src="data:image/*;base64,@(Convert.ToBase64String(user.AvatarFileData))" alt="" />
-													}
-													else
-													{
-														<img class="media-object" src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" alt="" style="width:30px;height:30px" />
-													}
-												</a>
-												<div class="media-body">
-													<span class="text-muted" style="font-size:x-small">
-														@comment.User?.FullName
-														<small class="float-right">@comment.Created.ToString("MM.dd.yyyy h:ss tt")</small>
-													</span>
-												</div>
+												
 												<span class="message text-primary">@Html.Raw(comment.Comment)</span>
 											</div>
 										</li>
@@ -199,9 +201,21 @@
 									<h6>@history.Description</h6>
 									<span>By: <a href="" title="@history.User.FullName">@history.User.FullName</a></span>
 									<div class="">
-										<p>The ticket <b>@history.Property</b> was edited</p>
-										<p>@($"Previous {history.Property}: {history.OldValue}")</p>
-										<p>@($"Current {history.Property}: {history.NewValue}")</p>
+										@if(history.Description.Contains("New ticket created"))
+										{
+											<p>A ticket was added</p>
+										}
+										else if(history.Property.Equals("TicketComment") || history.Property.Equals("TicketAttachment"))
+										{
+											<p>The ticket <b>@history.Property</b> was added</p>
+										}
+										else
+										{
+											<p>The ticket <b>@history.Property</b> was edited</p>
+											<p>@($"Previous {history.Property}: {history.OldValue}")</p>
+											<p>@($"Current {history.Property}: {history.NewValue}")</p>
+										}
+										
 
 
 									</div>
