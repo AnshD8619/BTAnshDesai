@@ -15,12 +15,11 @@
                 <hr />
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-floating">
-                    <select required class="form-control">
-                        <option id="developer">Developer</option>
-                        <option id="projectmanager">Project Manager</option>
-                        <option id="admin">Admin</option>
-                    </select>                        
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    <select required class="form-control" asp-for="Input.RoleName">
+                        <option value="developer">Developer</option>
+                        <option value="projectmanager">Project Manager</option>
+                        <option value="admin">Admin</option>
+                    </select>                                           
                 </div>      
                 <div>
                     <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>

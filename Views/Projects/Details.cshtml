@@ -37,9 +37,8 @@
                                         var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
 
                                     }
-                                    <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: @percent%;">
-                                        @* Use Progress Bar code variable here *@
-                                        <span class="progress-value">100%</span>
+                                    <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: @percent%;">                                      
+                                        <span class="progress-value">@percent</span>
                                     </div>
                                 </div>
                             </div>
@@ -51,7 +50,6 @@
                                 <li>Start Date: <span class="">@Model.StartDate.ToString("dd MMM, yyyy ")</span></li>
                                 <li>Deadline: <span class="">@Model.EndDate.ToString("dd MMM, yyyy ")</span></li>
                                 <li>Priority: <span class="">@Model.ProjectPriority?.Name</span></li>
-                                @* if() logic *@
                                 @{
                                     if(today < end && today >= start)
                                     {
@@ -75,7 +73,6 @@
                             <hr />
                         </div>
                         <div class="body" style="overflow-y:auto;height:300px;">
-                            [Project Manager]
                             @if(projectManager != null)
                             {
                                 <div>
@@ -107,7 +104,7 @@
                                     <div class="wid-u-info">
                                         <h5 class="text-muted m-b-0">Not Assigned</h5>
                                         @if (User.IsInRole(Roles.Admin.ToString())){
-                                            <span><a class="btn btn-xs btn-outline-info" style="font:small" asp-action="AssignProjectManager" asp-controller="Home" asp-route-id="@Model.Id">Assign Project Manager</a></span>
+                                            <span><a class="btn btn-xs btn-outline-info" style="font:small" asp-action="AssignPM" asp-controller="Projects" asp-route-projectId="@Model.Id">Assign Project Manager</a></span>
                                         }
                                                                
                                         </div>

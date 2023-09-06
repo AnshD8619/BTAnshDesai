@@ -31,13 +31,20 @@ namespace BTAnshDesai.Controllers
 			_userManager = userManager;
 			_companyInfoService = companyInfoService;
 		}
+		#region Get Actions
 
+		#region My Projects
+		[HttpGet]
 		public async Task<IActionResult> MyProjects()
 		{
 			string userId = _userManager.GetUserId(User);
 			List<Project> projects = await _projectService.GetUserProjectsAsync(userId);
 			return (View(projects));
 		}
+		#endregion
+
+		#region All Projects
+		[HttpGet]
 		public async Task<IActionResult> AllProjects()
 		{
 
@@ -54,21 +61,32 @@ namespace BTAnshDesai.Controllers
 			}
 			return (View(projects));
 		}
-
+		#endregion
+		
+		#region Archived Projects
+		[HttpGet]
 		public async Task<IActionResult> ArchivedProjects()
 		{
 			int companyId = User.Identity.GetCompanyId().Value;
 			List<Project> projects = await _projectService.GetArchivedProjectsByCompany(companyId);
 			return (View(projects));
 		}
+		#endregion
+
+		#region Unassigned Projects
 		[Authorize(Roles = "Admin")]
+		[HttpGet]
 		public async Task<IActionResult> UnassignedProjects()
 		{
 			int companyId = User.Identity.GetCompanyId().Value;
 			List<Project> projects = await _projectService.GetUnassignedProjectsAsync(companyId);
 			return (View(projects));
 		}
+		#endregion
+
+		#region AssignPM
 		[Authorize(Roles = "Admin")]
+		[HttpGet]
 		public async Task<IActionResult> AssignPM(int projectId)
 		{
 			int companyId = User.Identity.GetCompanyId().Value;
@@ -77,19 +95,11 @@ namespace BTAnshDesai.Controllers
 			model.PMList = new SelectList(await _rolesService.GetUsersInRoleAsync(Roles.ProjectManager.ToString(), companyId), "Id", "FullName");
 			return View(model);
 		}
-		[Authorize(Roles = "Admin")]
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> AssignPM(AssignPMViewModel model)
-		{
-			if (!string.IsNullOrEmpty(model.PMID))
-			{
-				await _projectService.AddProjectManagerAsync(model.PMID, model.Project.Id);
-				return RedirectToAction("Details", new { id = model.Project.Id });
-			}
-			return RedirectToAction("AssignPM", new { projectId = model.Project.Id });
-		}
+		#endregion
+
+		#region Assign Members
 		[Authorize(Roles = "Admin, ProjectManager")]
+		[HttpGet]
 		public async Task<IActionResult> AssignMembers(int id)
 		{
 			ProjectMembersViewModel model = new();
@@ -102,6 +112,108 @@ namespace BTAnshDesai.Controllers
 			model.Users = new MultiSelectList(members, "Id", "FullName");
 			return View(model);
 		}
+		#endregion
+
+		#region Details
+		[HttpGet]
+		public async Task<IActionResult> Details(int? id)
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
+			int companyId = User.Identity.GetCompanyId().Value;
+			Project project = await _projectService.GetProjectByIdAsync(id.Value, companyId);
+
+			if (project == null)
+			{
+				return NotFound();
+			}
+
+			return View(project);
+		}
+		#endregion
+
+		#region Create
+		[Authorize(Roles = "Admin, ProjectManager")]
+		[HttpGet]
+		public async Task<IActionResult> Create()
+		{
+			int companyId = User.Identity.GetCompanyId().Value;
+			AddProjectWithPMViewModel model = new();
+			model.Project = new Project();
+			model.PMList = new SelectList(await _rolesService.GetUsersInRoleAsync(Roles.ProjectManager.ToString(), companyId), "Id", "FullName");
+			model.PriorityList = new SelectList(await _lookupService.GetProjectPrioritiesAsync(), "Id", "Name");
+			return View(model);
+		}
+		#endregion
+
+		#region Edit
+		[Authorize(Roles = "Admin, ProjectManager")]
+		[HttpGet]
+		public async Task<IActionResult> Edit(int? id)
+		{
+			int companyId = User.Identity.GetCompanyId().Value;
+			AddProjectWithPMViewModel model = new();
+			model.Project = await _projectService.GetProjectByIdAsync(id.Value, companyId);
+			model.PMList = new SelectList(await _rolesService.GetUsersInRoleAsync(Roles.ProjectManager.ToString(), companyId), "Id", "FullName");
+			model.PriorityList = new SelectList(await _lookupService.GetProjectPrioritiesAsync(), "Id", "Name");
+			return View(model);
+		}
+		#endregion
+
+		#region Archive
+		[Authorize(Roles = "Admin, ProjectManager")]
+		[HttpGet]
+		public async Task<IActionResult> Archive(int? id)
+		{
+
+			int companyId = User.Identity.GetCompanyId().Value;
+			var project = await _projectService.GetProjectByIdAsync(id.Value, companyId);
+			if (project == null)
+			{
+				return NotFound();
+			}
+
+			return View(project);
+		}
+		#endregion
+
+		#region Restore
+		[Authorize(Roles = "Admin, ProjectManager")]
+		[HttpGet]
+		public async Task<IActionResult> Restore(int? id)
+		{
+			int companyId = User.Identity.GetCompanyId().Value;
+			var project = await _projectService.GetProjectByIdAsync(id.Value, companyId);
+			if (project == null)
+			{
+				return NotFound();
+			}
+
+			return View(project);
+		}
+		#endregion
+		#endregion
+
+		#region Post Actions
+
+		#region AssignPM
+		[Authorize(Roles = "Admin")]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> AssignPM(AssignPMViewModel model)
+		{
+			if (!string.IsNullOrEmpty(model.PMID))
+			{
+				await _projectService.AddProjectManagerAsync(model.PMID, model.Project.Id);
+				return RedirectToAction("Details", new { id = model.Project.Id });
+			}
+			return RedirectToAction("AssignPM", new { projectId = model.Project.Id });
+		}
+		#endregion
+
+		#region Assign Members
 		[Authorize(Roles = "Admin, ProjectManager")]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
@@ -122,45 +234,9 @@ namespace BTAnshDesai.Controllers
 			}
 			return RedirectToAction("AssignMembers", new { id = model.Project.Id });
 		}
-		// GET: Projects/Details/5
-		public async Task<IActionResult> Details(int? id)
-		{
-			if (id == null)
-			{
-				return NotFound();
-			}
+		#endregion
 
-			// Remember that the _context should not be used directly in the controller so....     
-
-			// Edit the following code to use the service layer. 
-			// Your goal is to return the 'project' from the databse
-			// with the Id equal to the parameter passed in.               
-			// This is the only modification necessary for this method/action.
-			int companyId = User.Identity.GetCompanyId().Value;
-			Project project = await _projectService.GetProjectByIdAsync(id.Value, companyId);
-
-			if (project == null)
-			{
-				return NotFound();
-			}
-
-			return View(project);
-		}
-		[Authorize(Roles = "Admin, ProjectManager")]
-		// GET: Projects/Create
-		public async Task<IActionResult> Create()
-		{
-			int companyId = User.Identity.GetCompanyId().Value;
-			AddProjectWithPMViewModel model = new();
-			model.Project = new Project();
-			model.PMList = new SelectList(await _rolesService.GetUsersInRoleAsync(Roles.ProjectManager.ToString(), companyId), "Id", "FullName");
-			model.PriorityList = new SelectList(await _lookupService.GetProjectPrioritiesAsync(), "Id", "Name");
-			return View(model);
-		}
-
-		// POST: Projects/Create
-		// To protect from overposting attacks, enable the specific properties you want to bind to.
-		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+		#region Create
 		[Authorize(Roles = "Admin, ProjectManager")]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
@@ -185,33 +261,19 @@ namespace BTAnshDesai.Controllers
 					{
 						await _projectService.AddProjectManagerAsync(model.PmId, model.Project.Id);
 					}
-
 				}
 				catch (Exception ex)
 				{
 					throw;
 				}
-				return RedirectToAction("Index");
+				return RedirectToAction("AllProjects");
 			}
 
 			return RedirectToAction("Create");
 		}
+		#endregion
 
-		// GET: Projects/Edit/5
-		[Authorize(Roles = "Admin, ProjectManager")]
-		public async Task<IActionResult> Edit(int? id)
-		{
-			int companyId = User.Identity.GetCompanyId().Value;
-			AddProjectWithPMViewModel model = new();
-			model.Project = await _projectService.GetProjectByIdAsync(id.Value, companyId);
-			model.PMList = new SelectList(await _rolesService.GetUsersInRoleAsync(Roles.ProjectManager.ToString(), companyId), "Id", "FullName");
-			model.PriorityList = new SelectList(await _lookupService.GetProjectPrioritiesAsync(), "Id", "Name");
-			return View(model);
-		}
-
-		// POST: Projects/Edit/5
-		// To protect from overposting attacks, enable the specific properties you want to bind to.
-		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+		#region Edit
 		[Authorize(Roles = "Admin, ProjectManager")]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
@@ -234,7 +296,7 @@ namespace BTAnshDesai.Controllers
 					{
 						await _projectService.AddProjectManagerAsync(model.PmId, model.Project.Id);
 					}
-					return RedirectToAction("Index");
+					return RedirectToAction("AllProjects");
 				}
 				catch (DbUpdateConcurrencyException)
 				{
@@ -251,25 +313,9 @@ namespace BTAnshDesai.Controllers
 			}
 			return RedirectToAction("Edit");
 		}
+		#endregion
 
-
-
-		// GET: Projects/Archive/5
-		[Authorize(Roles = "Admin, ProjectManager")]
-		public async Task<IActionResult> Archive(int? id)
-		{
-
-			int companyId = User.Identity.GetCompanyId().Value;
-			var project = await _projectService.GetProjectByIdAsync(id.Value, companyId);
-			if (project == null)
-			{
-				return NotFound();
-			}
-
-			return View(project);
-		}
-
-		// POST: Projects/Archive/5
+		#region Archive Confirmed
 		[Authorize(Roles = "Admin, ProjectManager")]
 		[HttpPost, ActionName("Archive")]
 		[ValidateAntiForgeryToken]
@@ -278,28 +324,22 @@ namespace BTAnshDesai.Controllers
 			int companyId = User.Identity.GetCompanyId().Value;
 			var project = await _projectService.GetProjectByIdAsync(id, companyId);
 			_projectService.ArchiveProjectAsync(project);
-			return RedirectToAction(nameof(Index));
+			return RedirectToAction(nameof(AllProjects));
 		}
-		[Authorize(Roles = "Admin, ProjectManager")]
-		public async Task<IActionResult> Restore(int? id)
-		{
-			int companyId = User.Identity.GetCompanyId().Value;
-			var project = await _projectService.GetProjectByIdAsync(id.Value, companyId);
-			if (project == null)
-			{
-				return NotFound();
-			}
+		#endregion
 
-			return View(project);
-		}
+		#region Restore Confirmed
 		[Authorize(Roles = "Admin, ProjectManager")]
+		[HttpPost]
 		public async Task<IActionResult> RestoreConfirmed(int id)
 		{
 			int companyId = User.Identity.GetCompanyId().Value;
 			var project = await _projectService.GetProjectByIdAsync(id, companyId);
 			await _projectService.RestoreProjectAsync(project);
-			return RedirectToAction(nameof(Index));
+			return RedirectToAction(nameof(AllProjects));
 		}
+		#endregion
+		#endregion
 		private async Task<bool> ProjectExistsAsync(int id)
 		{
 			int companyId = User.Identity.GetCompanyId().Value;
