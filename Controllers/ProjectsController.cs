@@ -109,7 +109,8 @@ namespace BTAnshDesai.Controllers
 			List<BTUser> submitters = await _rolesService.GetUsersInRoleAsync(Roles.Submitter.ToString(), companyId);
 			List<BTUser> companyMembers = developers.Concat(submitters).ToList();
 			List<string> members = model.Project.Members.Select(m => m.Id).ToList();
-			model.Users = new MultiSelectList(members, "Id", "FullName");
+			model.Users = new MultiSelectList(companyMembers, "Id", "FullName", members);
+			model.SelectedUsers = new List<string>();
 			return View(model);
 		}
 		#endregion

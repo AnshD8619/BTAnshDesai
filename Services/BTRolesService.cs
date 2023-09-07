@@ -66,8 +66,10 @@ namespace BTAnshDesai.Services
 			return users;
 		}
 		public async Task<bool> IsUserInRoleAsync(BTUser user, string roleName)
+
 		{
-			return (await _userManager.RemoveFromRoleAsync(user, roleName)).Succeeded;
+			return (await _userManager.IsInRoleAsync(user, roleName));
+			
 		}
 		public async Task<bool> RemoveUserFromRoleAsync(BTUser user, string roleName)
 		{
