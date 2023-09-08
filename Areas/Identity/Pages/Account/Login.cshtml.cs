@@ -96,7 +96,7 @@ namespace BTAnshDesai.Areas.Identity.Pages.Account
 			string emailLogIn = "";
 			if(Input.RoleName == "developer")
 			{
-				emailLogIn = "demodeveloper@gmail.com";
+				emailLogIn = "demodeveloper1@gmail.com";
 			}
 			else if (Input.RoleName == "projectmanager")
 			{

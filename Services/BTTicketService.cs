@@ -198,7 +198,7 @@ namespace BTAnshDesai.Services
 		{
 			try
 			{
-				List<Ticket> tickets = (await GetAllTicketsByCompanyAsync(companyId)).Where(t => t.Archived == true).ToList();
+				List<Ticket> tickets = (await GetAllTicketsByCompanyAsync(companyId)).Where(t => t.Archived == true || t.ArchivedByProject == true).ToList();
 				return tickets;
 			}
 			catch (Exception ex)

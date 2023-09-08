@@ -39,7 +39,7 @@ namespace BTAnshDesai.Controllers
         {
             BTUser user = await _userManager.GetUserAsync(User);
             List<Ticket> tickets = await _ticketService.GetTicketsByUserIdAsync(user.Id, user.CompanyId);
-            return View(tickets);
+            return View(tickets.Where(t => t.Archived == false && t.ArchivedByProject == false));
         }
 		#endregion
 
@@ -49,14 +49,7 @@ namespace BTAnshDesai.Controllers
         {
             int companyId = User.Identity.GetCompanyId().Value;
             List<Ticket> tickets = await _ticketService.GetAllTicketsByCompanyAsync(companyId);
-            if (User.IsInRole(Roles.DemoUser.ToString()) || User.IsInRole(Roles.Submitter.ToString()))
-            {
-                return View(tickets.Where(t => t.Archived = false));
-            }
-            else
-            {
-                return View(tickets);
-            }
+            return View(tickets.Where(t => t.Archived == false && t.ArchivedByProject == false));
         }
 		#endregion
 
@@ -81,7 +74,7 @@ namespace BTAnshDesai.Controllers
             List<Ticket> tickets = await _ticketService.GetUnassignedTicketsAsync(companyId);
             if (User.IsInRole(Roles.Admin.ToString()))
             {
-                return View(tickets);
+                return View(tickets.Where(t => t.Archived == false && t.ArchivedByProject ==false));
             }
             else
             {
@@ -93,7 +86,7 @@ namespace BTAnshDesai.Controllers
                         filteredTickets.Add(ticket);
                     }
                 }
-                return View(filteredTickets);
+                return View(filteredTickets.Where(t => t.Archived == false && t.ArchivedByProject == false));
             }
 
 

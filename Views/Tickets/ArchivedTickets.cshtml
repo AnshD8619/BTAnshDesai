@@ -90,16 +90,9 @@
                 
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
 
-                    @if(User.IsInRole(Roles.Admin.ToString()) || await ProjectService.IsAssignedProjectManager(user.Id, item.ProjectId))
+                    @if((User.IsInRole(Roles.Admin.ToString()) || await ProjectService.IsAssignedProjectManager(user.Id, item.ProjectId)) && item.ArchivedByProject == false)
                     {
-                        @if (item.Archived == true)
-                        {
-                            <a asp-action="Restore" asp-route-id="@item.Id">Restore</a>
-                        }
-                        else
-                        {
-                            <a asp-action="Archive" asp-route-id="@item.Id">Archive</a>
-                        }
+                        <a asp-action="Restore" asp-route-id="@item.Id">Restore</a>                            
                     }
                                 
             </td>

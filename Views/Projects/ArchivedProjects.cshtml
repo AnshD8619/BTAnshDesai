@@ -95,8 +95,7 @@
                     @if (User.IsInRole(Roles.Admin.ToString()) || isProjectPM)
                     {
                         <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>                       
-                            <a asp-action="Restore" asp-route-id="@item.Id">Restore</a>
-                        
+                        <a asp-action="Restore" asp-route-id="@item.Id">Restore</a>   
                     }
                    
                     

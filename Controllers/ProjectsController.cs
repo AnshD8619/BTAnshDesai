@@ -21,25 +21,27 @@ namespace BTAnshDesai.Controllers
 		private readonly IBTProjectService _projectService;
 		private readonly UserManager<BTUser> _userManager;
 		private readonly IBTCompanyInfoService _companyInfoService;
-		public ProjectsController(IBTRolesService rolesService, IBTLookupService lookupService, IBTFileService fileService, IBTProjectService projectService, UserManager<BTUser> userManager, IBTCompanyInfoService companyInfoService)
-		{
+		private readonly IBTTicketService _ticketService;
+        public ProjectsController(IBTRolesService rolesService, IBTLookupService lookupService, IBTFileService fileService, IBTProjectService projectService, UserManager<BTUser> userManager, IBTCompanyInfoService companyInfoService, IBTTicketService ticketService)
+        {
 
-			_rolesService = rolesService;
-			_lookupService = lookupService;
-			_fileService = fileService;
-			_projectService = projectService;
-			_userManager = userManager;
-			_companyInfoService = companyInfoService;
-		}
-		#region Get Actions
+            _rolesService = rolesService;
+            _lookupService = lookupService;
+            _fileService = fileService;
+            _projectService = projectService;
+            _userManager = userManager;
+            _companyInfoService = companyInfoService;
+            _ticketService = ticketService;
+        }
+        #region Get Actions
 
-		#region My Projects
-		[HttpGet]
+        #region My Projects
+        [HttpGet]
 		public async Task<IActionResult> MyProjects()
 		{
 			string userId = _userManager.GetUserId(User);
 			List<Project> projects = await _projectService.GetUserProjectsAsync(userId);
-			return (View(projects));
+			return (View(projects.Where(p => p.Archived == false)));
 		}
 		#endregion
 
@@ -47,19 +49,11 @@ namespace BTAnshDesai.Controllers
 		[HttpGet]
 		public async Task<IActionResult> AllProjects()
 		{
-
 			List<Project> projects = new();
 			int companyId = User.Identity.GetCompanyId().Value;
-			if (User.IsInRole(Roles.Admin.ToString()) || User.IsInRole(Roles.ProjectManager.ToString()))
-			{
-
-				projects = await _companyInfoService.GetAllProjectsAsync(companyId);
-			}
-			else
-			{
-
-			}
-			return (View(projects));
+			projects = await _companyInfoService.GetAllProjectsAsync(companyId);
+			
+			return (View(projects.Where(p => p.Archived == false)));
 		}
 		#endregion
 		
@@ -80,7 +74,7 @@ namespace BTAnshDesai.Controllers
 		{
 			int companyId = User.Identity.GetCompanyId().Value;
 			List<Project> projects = await _projectService.GetUnassignedProjectsAsync(companyId);
-			return (View(projects));
+			return (View(projects.Where(p => p.Archived == false)));
 		}
 		#endregion
 
@@ -325,6 +319,11 @@ namespace BTAnshDesai.Controllers
 			int companyId = User.Identity.GetCompanyId().Value;
 			var project = await _projectService.GetProjectByIdAsync(id, companyId);
 			_projectService.ArchiveProjectAsync(project);
+			foreach(Ticket ticket in project.Tickets)
+			{
+				ticket.ArchivedByProject = true;
+				_ticketService.UpdateTicketAsync(ticket);
+			}
 			return RedirectToAction(nameof(AllProjects));
 		}
 		#endregion
